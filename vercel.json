@@ -1,0 +1,10 @@
+{
+  "buildCommand": "pnpm --filter @workspace/librairie-2b run build",
+  "outputDirectory": "artifacts/librairie-2b/dist/public",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "framework": null,
+  "env": {
+    "BASE_PATH": "/",
+    "NODE_ENV": "production"
+  }
+}
