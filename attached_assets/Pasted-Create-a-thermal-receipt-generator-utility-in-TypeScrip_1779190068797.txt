@@ -1,0 +1,39 @@
+Create a thermal receipt generator utility in TypeScript for a French bookstore called "Librairie 2B".
+
+Build a single file src/lib/receiptBuilder.ts that exports a buildReceiptHTML(data: ReceiptData) function returning a complete, self-contained HTML string ready to open in a popup window and print.
+
+Printer specs: 75mm thermal printer. @page { size: 75mm auto; margin: 2mm 3mm; }. Body width 69mm, padding: 1mm 3mm 1mm 0 (3mm right padding so values don't bleed to edge). Font: 'Courier New', Courier, monospace throughout — thermal printers render monospace cleanly at small sizes.
+
+Data shape:
+
+interface ReceiptChild { ecole: string; niveau: string; genre?: string | null; code: string }
+interface ReceiptData {
+  nom: string; telephone?: string | null; avance?: number | string | null;
+  note?: string | null; couverture_demandee?: boolean;
+  children: ReceiptChild[]; created_at?: string
+}
+
+Receipt layout (top to bottom):
+
+Header — border-top: 3px double #111; border-bottom: 3px double #111. Centered store name LIBRAIRIE 2B in 15px, font-weight:900, letter-spacing: 3px. Small LIBRAIRIE SCOLAIRE subtitle in 7px black (color:#111) uppercase with letter-spacing: 2.5px.
+
+Date / Time — single row, display:flex; justify-content:space-between, 7.5px black (color:#111). Date in French long format (18 mai 2026), time as HH:MM. Use created_at if provided, otherwise new Date().
+
+Confirmation badge — centered inline box with border: 1.5px solid #111; border-radius: 2px; padding: 3px 10px. Bold uppercase ✓ Commande Confirmée.
+
+One code box per child — border: 1.5px solid #222. Label: CODE DE RÉFÉRENCE (single child) or ENFANT 1, ENFANT 2 (multi), in 6.5px black uppercase letter-spacing:2px. Code: 24px, font-weight: 900, letter-spacing: 8px. For multi-child: school + level subtitle in 7px black below the code.
+
+DÉTAILS section — section headers use display:flex with flex:1 height:1px background:#bbb lines flanking a centered label in 7px bold black (color:#111, letter-spacing:1.5px). All data rows: display:flex; justify-content:space-between. Labels: plain black (color:#111), not bold, left-aligned, white-space:nowrap. Values: font-weight:600, right-aligned, flex:1; margin-left:6px; word-break:break-word.
+
+── DÉTAILS ── header, then Nom row, optional Tél row
+For each child: ── ENFANT ── (or ── ENFANT 1 ──) header + École, Niveau, Genre (Fille/Garçon), Code (monospace, letter-spacing:2px) rows
+If couverture_demandee: ── COUVERTURE ── header + Couverture → DEMANDÉE (bold)
+If avance > 0: ── AVANCE ── header + Avance → X DHS (bold green #1a7a3c)
+If note: ── NOTE ── header + plain wrapping text below
+Footer — border-top: 3px double #111; margin-top: 7px. Centered Merci pour votre confiance ! in 8px black (color:#111).
+
+Usage pattern (for a print button):
+
+const html = buildReceiptHTML({ nom, telephone, avance, note, couverture_demandee, children })
+const win = window.open('', '_blank', 'width=320,height=600')
+win.document.write(html); win.document.close(); win.focus(); win.print(); win.close()

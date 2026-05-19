@@ -19,7 +19,7 @@ function sectionHeader(label: string): string {
   return `
   <div style="display:flex;align-items:center;margin:5px 0 3px;">
     <div style="flex:1;height:1px;background:#bbb;"></div>
-    <div style="padding:0 5px;font-size:7px;font-weight:bold;letter-spacing:1.5px;color:#444;">${label}</div>
+    <div style="padding:0 5px;font-size:7px;font-weight:bold;letter-spacing:1.5px;color:#111;">${label}</div>
     <div style="flex:1;height:1px;background:#bbb;"></div>
   </div>`
 }
@@ -27,7 +27,7 @@ function sectionHeader(label: string): string {
 function row(label: string, value: string, valueStyle = ''): string {
   return `
   <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;font-size:8.5px;">
-    <span style="color:#666;white-space:nowrap;">${label}</span>
+    <span style="color:#111;white-space:nowrap;">${label}</span>
     <span style="text-align:right;word-break:break-word;flex:1;margin-left:6px;font-weight:600;${valueStyle}">${value}</span>
   </div>`
 }
@@ -44,9 +44,9 @@ export function buildReceiptHTML(data: ReceiptData): string {
     const label = multiChild ? `ENFANT ${i + 1}` : 'CODE DE R&Eacute;F&Eacute;RENCE'
     return `
     <div style="border:1.5px solid #222;margin:5px 0;padding:5px 4px;text-align:center;">
-      <div style="font-size:6.5px;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:3px;">${label}</div>
+      <div style="font-size:6.5px;letter-spacing:2px;color:#111;text-transform:uppercase;margin-bottom:3px;">${label}</div>
       <div style="font-family:'Courier New',Courier,monospace;font-size:24px;font-weight:900;letter-spacing:8px;line-height:1;color:#111;">${child.code}</div>
-      ${multiChild ? `<div style="font-size:7px;color:#555;margin-top:3px;letter-spacing:0.5px;">${child.ecole} &mdash; ${child.niveau}</div>` : ''}
+      ${multiChild ? `<div style="font-size:7px;color:#111;margin-top:3px;letter-spacing:0.5px;">${child.ecole} &mdash; ${child.niveau}</div>` : ''}
     </div>`
   }).join('')
 
@@ -83,13 +83,13 @@ export function buildReceiptHTML(data: ReceiptData): string {
     @page { size: 75mm auto; margin: 2mm 3mm; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: 'Courier New', Courier, monospace;
       font-size: 8.5px;
       line-height: 1.3;
       color: #111;
       background: #fff;
       width: 69mm;
-      padding: 1mm 0;
+      padding: 1mm 3mm 1mm 0;
     }
     @media print {
       body { width: 100%; }
@@ -100,12 +100,12 @@ export function buildReceiptHTML(data: ReceiptData): string {
 
   <!-- ── HEADER ── -->
   <div style="border-top:3px double #111;border-bottom:3px double #111;padding:5px 0;text-align:center;margin-bottom:6px;">
-    <div style="font-size:15px;font-weight:900;letter-spacing:3px;line-height:1;">ESPACE BEN ALI</div>
-    <div style="font-size:7px;letter-spacing:2.5px;color:#666;margin-top:2px;text-transform:uppercase;">Librairie Scolaire</div>
+    <div style="font-size:15px;font-weight:900;letter-spacing:3px;line-height:1;">LIBRAIRIE 2B</div>
+    <div style="font-size:7px;letter-spacing:2.5px;color:#111;margin-top:2px;text-transform:uppercase;">Librairie Scolaire</div>
   </div>
 
   <!-- ── DATE / TIME ── -->
-  <div style="display:flex;justify-content:space-between;font-size:7.5px;color:#555;margin-bottom:5px;">
+  <div style="display:flex;justify-content:space-between;font-size:7.5px;color:#111;margin-bottom:5px;">
     <span>${dateStr}</span>
     <span>${timeStr}</span>
   </div>
@@ -132,7 +132,7 @@ export function buildReceiptHTML(data: ReceiptData): string {
 
   <!-- ── FOOTER ── -->
   <div style="border-top:3px double #111;margin-top:7px;padding-top:5px;text-align:center;">
-    <div style="font-size:8px;color:#444;letter-spacing:0.5px;">Merci pour votre confiance&nbsp;!</div>
+    <div style="font-size:8px;color:#111;letter-spacing:0.5px;">Merci pour votre confiance&nbsp;!</div>
   </div>
 
 </body>
