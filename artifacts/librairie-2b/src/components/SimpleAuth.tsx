@@ -34,7 +34,7 @@ function SimpleAuth({ onAuthSuccess, title, description, onUserIdentified, onRol
       if (data && data.active && data.password === password) {
         if (onUserIdentified) onUserIdentified(data.email)
         if (onRoleIdentified) {
-          const role = data.role === 'admin' ? 'gerant' : 'utilisateur'
+          const role = data.role === 'admin' ? 'gerant' : data.role === 'couverture' ? 'couverture' : 'utilisateur'
           onRoleIdentified(role)
         }
         onAuthSuccess()
