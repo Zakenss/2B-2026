@@ -236,7 +236,7 @@ function App() {
           </button>
           )}
 
-          {(currentUserRole === 'gerant' || currentUserRole === 'couverture') && (
+          {currentUserRole === 'gerant' && (
           <button
             onClick={() => handlePageSelect('couverture')}
             className="group bg-espresso-50 rounded-2xl p-6 text-left shadow-sm hover:shadow-book transition-all duration-200 border border-espresso-200"
@@ -316,7 +316,7 @@ function App() {
       case 'ecole':
         return isEspaceClientAuthenticated ? <EcoleManagement onNavigate={setCurrentPage} /> : renderHomePage()
       case 'couverture':
-        return (isEspaceClientAuthenticated && (currentUserRole === 'gerant' || currentUserRole === 'couverture')) ? <CouverturePage onNavigate={setCurrentPage} currentUser={currentUser} /> : renderHomePage()
+        return (isEspaceClientAuthenticated && currentUserRole === 'gerant') ? <CouverturePage onNavigate={setCurrentPage} currentUser={currentUser} /> : renderHomePage()
       case 'zakaria':
         return (isEspaceClientAuthenticated && currentUserRole === 'gerant') ? <AccessPage onNavigate={setCurrentPage} /> : renderHomePage()
       default:
