@@ -85,6 +85,7 @@ export function buildReceiptHTML(data: ReceiptData): string {
     body {
       font-family: 'Courier New', Courier, monospace;
       font-size: 10px;
+      font-weight: bold;
       line-height: 1.35;
       color: #000;
       background: #fff;
