@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Package, Search, Check, Save } from 'lucide-react'
+import { Package, Search, MapPin } from 'lucide-react'
 import { supabase, Student } from '../lib/supabase'
 
 interface CouverturePageProps {
@@ -115,7 +115,15 @@ function CouverturePage({ onNavigate, currentUser }: CouverturePageProps) {
               <div className="p-6 flex-grow flex flex-col">
                 <h3 className="text-xl font-bold text-espresso-900 mb-1">{order.nom}</h3>
                 <p className="text-sm text-espresso-600 mb-1">{order.ecole} — {order.niveau}</p>
-                <p className="text-xs font-medium text-espresso-400 mb-6">{new Date(order.created_at ?? '').toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                <p className="text-xs font-medium text-espresso-400 mb-3">{new Date(order.created_at ?? '').toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                {order.liste_prete && (order.rangee || order.niveau_rangement) && (
+                  <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 mb-3">
+                    <MapPin className="h-4 w-4 text-green-700 shrink-0" />
+                    <span className="text-sm font-bold text-green-800 uppercase tracking-wide">
+                      {[order.rangee, order.niveau_rangement].filter(Boolean).join(' — ')}
+                    </span>
+                  </div>
+                )}
                 <div className="mt-auto pt-6 border-t border-parchment-200">
                   <button
                     onClick={() => handleMarkAsSent(order)}
