@@ -189,54 +189,65 @@ function EmployeeSearch() {
     )
   }
 
+  const hasResult = Boolean(bookList || notFound)
+
   return (
-    <div className="max-w-2xl mx-auto px-4 pb-16">
+    <div className="w-full min-w-0 max-w-2xl md:mx-auto px-3 sm:px-4 pb-8 overflow-x-hidden">
 
       {/* Top bar */}
-      <div className="flex items-center justify-between py-4 mb-8 border-b border-parchment-200">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-espresso-900 rounded-lg flex items-center justify-center">
+      <div className="flex items-center justify-between gap-2 py-3 mb-3 sm:mb-4 border-b border-parchment-200">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-8 h-8 shrink-0 bg-espresso-900 rounded-lg flex items-center justify-center">
             <User className="h-4 w-4 text-parchment-100" />
           </div>
-          <div>
-            <p className="text-xs text-espresso-500 font-medium uppercase tracking-widest">Connecté</p>
-            <p className="text-sm font-bold text-espresso-900">{currentEmployee}</p>
+          <div className="min-w-0">
+            <p className="text-[10px] text-espresso-500 font-medium uppercase tracking-widest">Connecté</p>
+            <p className="text-sm font-bold text-espresso-900 truncate">{currentEmployee}</p>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="px-4 py-2 bg-parchment-200 text-espresso-700 rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-parchment-300 transition-colors"
+          className="shrink-0 px-3 py-2.5 min-h-11 bg-parchment-200 text-espresso-700 rounded-lg font-bold text-[10px] sm:text-xs uppercase tracking-wider hover:bg-parchment-300 transition-colors"
         >
-          Se déconnecter
+          Déconnexion
         </button>
       </div>
 
-      {/* Page title */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-14 h-14 bg-espresso-900 rounded-2xl mb-4 shadow-md">
-          <Search className="h-7 w-7 text-parchment-100" />
+      {/* Page title — hidden when showing search result to save space */}
+      {!hasResult && (
+        <div className="text-center mb-5 sm:mb-6">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-espresso-900 rounded-2xl mb-3 shadow-md">
+            <Search className="h-6 w-6 text-parchment-100" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-heading font-bold text-espresso-900 mb-1">Recherche Commande</h1>
+          <p className="text-espresso-500 text-sm font-medium">Code à 4 caractères</p>
         </div>
-        <h1 className="text-3xl font-heading font-bold text-espresso-900 mb-1">Recherche Commande</h1>
-        <p className="text-espresso-500 text-sm font-medium">Entrez le code à 4 caractères</p>
-      </div>
+      )}
 
-      {/* Search box */}
-      <form onSubmit={handleSearch} className="flex gap-3 mb-8">
+      {/* Search box — sticky on mobile when result is shown */}
+      <form
+        onSubmit={handleSearch}
+        className={`flex flex-col sm:flex-row gap-2 sm:gap-3 ${hasResult ? 'mb-3 sm:mb-4 sticky top-14 sm:top-16 z-40 bg-parchment-100/95 backdrop-blur-sm py-2 -mx-3 px-3 sm:static sm:mx-0 sm:px-0 sm:py-0 sm:bg-transparent sm:backdrop-blur-none' : 'mb-5 sm:mb-6'}`}
+      >
         <input
           type="text"
+          inputMode="text"
+          autoComplete="off"
+          autoCapitalize="characters"
+          enterKeyHint="search"
           value={searchCode}
           onChange={(e) => {
             setSearchCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4))
             setNotFound(false)
           }}
-          placeholder="EX: AB12"
+          placeholder="AB12"
           maxLength={4}
-          className="flex-1 px-5 py-4 text-2xl text-center border-2 border-parchment-300 rounded-xl focus:ring-0 focus:border-amber-500 transition-colors tracking-[0.3em] font-mono font-bold uppercase bg-white text-espresso-900 placeholder-parchment-300 shadow-sm"
+          className="w-full min-w-0 px-4 py-3.5 sm:py-4 text-3xl sm:text-2xl text-center border-2 border-parchment-300 rounded-xl focus:ring-0 focus:border-amber-500 transition-colors tracking-[0.35em] font-mono font-bold uppercase bg-white text-espresso-900 placeholder-parchment-300 shadow-sm"
         />
         <button
           type="submit"
           disabled={searchCode.length !== 4 || isSearching}
-          className="px-6 py-4 bg-amber-600 text-white rounded-xl font-bold uppercase tracking-wider hover:bg-amber-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm shadow-md whitespace-nowrap"
+          className="w-full sm:w-auto shrink-0 px-5 py-3.5 sm:py-4 min-h-12 bg-amber-600 text-white rounded-xl font-bold uppercase tracking-wider hover:bg-amber-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm shadow-md"
         >
           {isSearching ? 'Recherche…' : 'Rechercher'}
         </button>
@@ -244,7 +255,7 @@ function EmployeeSearch() {
 
       {/* Not found */}
       {notFound && (
-        <div className="bg-white rounded-2xl border border-parchment-200 shadow-sm p-10 text-center">
+        <div className="bg-white rounded-2xl border border-parchment-200 shadow-sm p-5 sm:p-8 text-center w-full">
           <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <Search className="h-7 w-7 text-red-400" />
           </div>
@@ -255,21 +266,21 @@ function EmployeeSearch() {
 
       {/* Order card */}
       {bookList && (
-        <div className="space-y-4">
+        <div className="space-y-3 w-full min-w-0">
 
           {/* Order header */}
-          <div className={`rounded-2xl border-2 overflow-hidden shadow-sm ${bookList.liste_prete ? 'border-green-200' : 'border-amber-200'}`}>
-            <div className={`flex items-center justify-between px-6 py-4 ${bookList.liste_prete ? 'bg-green-50' : 'bg-amber-50'}`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${bookList.liste_prete ? 'bg-green-600' : 'bg-amber-500'}`}>
+          <div className={`rounded-2xl border-2 overflow-hidden shadow-sm w-full ${bookList.liste_prete ? 'border-green-200' : 'border-amber-200'}`}>
+            <div className={`flex flex-wrap items-center justify-between gap-2 px-3 py-3 sm:px-5 ${bookList.liste_prete ? 'bg-green-50' : 'bg-amber-50'}`}>
+              <div className="flex items-center gap-2 min-w-0">
+                <div className={`w-9 h-9 shrink-0 rounded-xl flex items-center justify-center ${bookList.liste_prete ? 'bg-green-600' : 'bg-amber-500'}`}>
                   <Package className="h-5 w-5 text-white" />
                 </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-espresso-500">Commande</p>
-                  <p className="text-lg font-mono font-black text-espresso-900 tracking-widest">#{bookList.code}</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-espresso-500">Commande</p>
+                  <p className="text-xl sm:text-lg font-mono font-black text-espresso-900 tracking-widest">#{bookList.code}</p>
                 </div>
               </div>
-              <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${
+              <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider border ${
                 bookList.liste_prete
                   ? 'bg-green-100 text-green-800 border-green-300'
                   : 'bg-amber-100 text-amber-800 border-amber-300'
@@ -279,53 +290,53 @@ function EmployeeSearch() {
             </div>
 
             {/* Order details */}
-            <div className="bg-white px-6 py-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-start gap-2">
+            <div className="bg-white px-3 py-4 sm:px-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex items-start gap-2 min-w-0">
                   <User className="h-4 w-4 text-espresso-400 mt-0.5 shrink-0" />
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-bold text-espresso-400 uppercase tracking-widest mb-0.5">Client</p>
-                    <p className="text-sm font-bold text-espresso-900">{bookList.nom}</p>
+                    <p className="text-sm font-bold text-espresso-900 break-words">{bookList.nom}</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-2">
+                <div className="flex items-start gap-2 min-w-0">
                   <Calendar className="h-4 w-4 text-espresso-400 mt-0.5 shrink-0" />
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-bold text-espresso-400 uppercase tracking-widest mb-0.5">Date</p>
                     <p className="text-sm font-medium text-espresso-900">
                       {new Date(bookList.created_at ?? '').toLocaleDateString('fr-FR')}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-2">
+                <div className="flex items-start gap-2 min-w-0">
                   <School className="h-4 w-4 text-espresso-400 mt-0.5 shrink-0" />
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-bold text-espresso-400 uppercase tracking-widest mb-0.5">École</p>
-                    <p className="text-sm font-medium text-espresso-900">{bookList.ecole}</p>
+                    <p className="text-sm font-medium text-espresso-900 break-words">{bookList.ecole}</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-2">
+                <div className="flex items-start gap-2 min-w-0">
                   <Layers className="h-4 w-4 text-espresso-400 mt-0.5 shrink-0" />
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-bold text-espresso-400 uppercase tracking-widest mb-0.5">Niveau</p>
                     <p className="text-sm font-medium text-espresso-900">{bookList.niveau}</p>
                   </div>
                 </div>
                 {bookList.telephone && (
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-start gap-2 min-w-0">
                     <Phone className="h-4 w-4 text-espresso-400 mt-0.5 shrink-0" />
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-xs font-bold text-espresso-400 uppercase tracking-widest mb-0.5">Téléphone</p>
-                      <p className="text-sm font-medium text-espresso-900">{bookList.telephone}</p>
+                      <p className="text-sm font-medium text-espresso-900 break-all">{bookList.telephone}</p>
                     </div>
                   </div>
                 )}
                 {bookList.email && (
-                  <div className="flex items-start gap-2 col-span-2">
+                  <div className="flex items-start gap-2 min-w-0 sm:col-span-2">
                     <Mail className="h-4 w-4 text-espresso-400 mt-0.5 shrink-0" />
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-xs font-bold text-espresso-400 uppercase tracking-widest mb-0.5">Email</p>
-                      <p className="text-sm font-medium text-espresso-900">{bookList.email}</p>
+                      <p className="text-sm font-medium text-espresso-900 break-all">{bookList.email}</p>
                     </div>
                   </div>
                 )}
@@ -333,10 +344,10 @@ function EmployeeSearch() {
 
               {/* Location badge if already placed */}
               {bookList.liste_prete && bookList.rangee && bookList.niveau_rangement && (
-                <div className="mt-4 flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2.5">
+                <div className="mt-3 flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5 w-full min-w-0">
                   <MapPin className="h-4 w-4 text-green-600 shrink-0" />
-                  <p className="text-sm text-green-800 font-medium">
-                    Rangée <strong>{bookList.rangee}</strong> · Étagère <strong>{bookList.niveau_rangement}</strong>
+                  <p className="text-sm text-green-900 font-bold break-words">
+                    Stockée en <span className="font-mono">({bookList.rangee}, {bookList.niveau_rangement})</span>
                   </p>
                 </div>
               )}
@@ -344,42 +355,42 @@ function EmployeeSearch() {
           </div>
 
           {/* Update form */}
-          <div className="bg-white rounded-2xl border border-parchment-200 shadow-sm overflow-hidden">
-            <div className="bg-parchment-100 border-b border-parchment-200 px-6 py-4 flex items-center gap-2">
-              <Check className="h-4 w-4 text-amber-700" />
+          <div className="bg-white rounded-2xl border border-parchment-200 shadow-sm overflow-hidden w-full">
+            <div className="bg-parchment-100 border-b border-parchment-200 px-3 py-3 sm:px-5 flex items-center gap-2">
+              <Check className="h-4 w-4 text-amber-700 shrink-0" />
               <h3 className="text-sm font-bold uppercase tracking-widest text-espresso-800">Mise à jour du statut</h3>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-3 sm:p-5 space-y-5">
 
               {/* Liste prête toggle */}
               <div>
                 <label className="block text-xs font-bold text-espresso-500 uppercase tracking-widest mb-3">
                   La liste est-elle prête ? <span className="text-red-500 ml-1">*</span>
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <button
                     type="button"
                     onClick={() => setUpdateForm(prev => ({ ...prev, liste_prete: true }))}
-                    className={`flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm uppercase tracking-wide transition-all border-2 ${
+                    className={`flex items-center justify-center gap-1.5 sm:gap-2 py-3.5 min-h-12 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wide transition-all border-2 ${
                       updateForm.liste_prete
                         ? 'bg-green-600 text-white border-green-600 shadow-md'
                         : 'bg-white text-espresso-500 border-parchment-300 hover:border-green-400 hover:text-green-700'
                     }`}
                   >
-                    <Check className="h-4 w-4" />
+                    <Check className="h-4 w-4 shrink-0" />
                     Oui, prête
                   </button>
                   <button
                     type="button"
                     onClick={() => setUpdateForm(prev => ({ ...prev, liste_prete: false, rangee: '', niveau_rangement: '' }))}
-                    className={`flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm uppercase tracking-wide transition-all border-2 ${
+                    className={`flex items-center justify-center gap-1.5 sm:gap-2 py-3.5 min-h-12 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wide transition-all border-2 ${
                       !updateForm.liste_prete
                         ? 'bg-amber-500 text-white border-amber-500 shadow-md'
                         : 'bg-white text-espresso-500 border-parchment-300 hover:border-amber-400 hover:text-amber-700'
                     }`}
                   >
-                    <Clock className="h-4 w-4" />
+                    <Clock className="h-4 w-4 shrink-0" />
                     En attente
                   </button>
                 </div>
@@ -387,21 +398,21 @@ function EmployeeSearch() {
 
               {/* Rangée + Étagère — only shown when liste_prete = true */}
               {updateForm.liste_prete && (
-                <div className="rounded-xl border-2 border-dashed border-parchment-300 bg-parchment-50 p-4 space-y-4">
+                <div className="rounded-xl border-2 border-dashed border-parchment-300 bg-parchment-50 p-3 sm:p-4 space-y-4">
                   <p className="text-xs font-bold text-espresso-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-amber-600" />
+                    <MapPin className="h-3.5 w-3.5 text-amber-600 shrink-0" />
                     Emplacement de rangement <span className="text-red-500">*</span>
                   </p>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="min-w-0">
                       <label className="block text-xs font-semibold text-espresso-600 mb-2">
                         Rangée <span className="text-red-500">*</span>
                       </label>
                       <select
                         value={updateForm.rangee}
                         onChange={(e) => setUpdateForm(prev => ({ ...prev, rangee: e.target.value }))}
-                        className={`w-full px-3 py-3 border-2 rounded-xl focus:ring-0 focus:border-amber-500 transition-colors bg-white text-espresso-900 font-bold text-sm ${
+                        className={`w-full min-w-0 px-2 sm:px-3 py-3 min-h-12 border-2 rounded-xl focus:ring-0 focus:border-amber-500 transition-colors bg-white text-espresso-900 font-bold text-sm ${
                           updateForm.rangee === '' ? 'border-red-300 bg-red-50' : 'border-parchment-300'
                         }`}
                       >
@@ -415,14 +426,14 @@ function EmployeeSearch() {
                       )}
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
                       <label className="block text-xs font-semibold text-espresso-600 mb-2">
                         Étagère <span className="text-red-500">*</span>
                       </label>
                       <select
                         value={updateForm.niveau_rangement}
                         onChange={(e) => setUpdateForm(prev => ({ ...prev, niveau_rangement: e.target.value }))}
-                        className={`w-full px-3 py-3 border-2 rounded-xl focus:ring-0 focus:border-amber-500 transition-colors bg-white text-espresso-900 font-bold text-sm ${
+                        className={`w-full min-w-0 px-2 sm:px-3 py-3 min-h-12 border-2 rounded-xl focus:ring-0 focus:border-amber-500 transition-colors bg-white text-espresso-900 font-bold text-sm ${
                           updateForm.niveau_rangement === '' ? 'border-red-300 bg-red-50' : 'border-parchment-300'
                         }`}
                       >
@@ -441,7 +452,7 @@ function EmployeeSearch() {
 
               {/* Validation hint */}
               {!canSubmit && (
-                <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 sm:px-4 py-3">
                   <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
                   <p className="text-xs text-amber-800 font-medium leading-snug">
                     {!updateForm.liste_prete
@@ -453,7 +464,7 @@ function EmployeeSearch() {
 
               {/* Success banner */}
               {updateSuccess && (
-                <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 sm:px-4 py-3">
                   <Check className="h-4 w-4 text-green-600 shrink-0" />
                   <p className="text-sm text-green-800 font-semibold">Statut mis à jour avec succès !</p>
                 </div>
@@ -463,7 +474,7 @@ function EmployeeSearch() {
               <button
                 onClick={handleUpdate}
                 disabled={isUpdating || !canSubmit}
-                className={`w-full py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition-all shadow-md flex items-center justify-center gap-2 ${
+                className={`w-full py-4 min-h-12 rounded-xl font-bold uppercase tracking-wider text-sm transition-all shadow-md flex items-center justify-center gap-2 ${
                   canSubmit
                     ? 'bg-espresso-900 text-white hover:bg-espresso-800 cursor-pointer'
                     : 'bg-parchment-300 text-espresso-400 cursor-not-allowed shadow-none'
