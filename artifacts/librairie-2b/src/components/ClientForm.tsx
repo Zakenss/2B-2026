@@ -165,7 +165,10 @@ function ClientForm({ onNavigate }: ClientFormProps) {
             genre: child.genre,
             email: formData.email.trim(),
             telephone: formData.telephone.trim(),
-            avance: formData.avance && formData.avance.trim() ? parseFloat(formData.avance) : null,
+            // Avance only for the first child — never duplicate for siblings
+            avance: index === 0 && formData.avance && formData.avance.trim()
+              ? parseFloat(formData.avance)
+              : null,
             note: formData.note.trim(),
             couverture_demandee: formData.couverture_demandee,
           };

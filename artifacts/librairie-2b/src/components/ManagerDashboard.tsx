@@ -48,16 +48,34 @@ function ManagerDashboard({ onNavigate }: ManagerDashboardProps) {
 
   const dailyAvances = useMemo(() => {
     if (!avanceDate) return []
-    return bookLists
-      .filter(order => hasAvanceValue(order.avance) && toLocalDateKey(order.created_at) === avanceDate)
-      .map(order => ({
+    const seenOrders = new Set<string>()
+    const rows: Array<{
+      id: string
+      nom: string
+      code: string
+      avance: Student['avance']
+      amount: number
+    }> = []
+
+    for (const order of bookLists) {
+      if (!hasAvanceValue(order.avance)) continue
+      if (toLocalDateKey(order.created_at) !== avanceDate) continue
+
+      // One avance per client order (same created_at batch) — never count sibling kids twice
+      const orderKey = `${order.nom ?? ''}|${order.created_at ?? ''}`
+      if (seenOrders.has(orderKey)) continue
+      seenOrders.add(orderKey)
+
+      rows.push({
         id: order.id,
         nom: order.nom ?? '—',
         code: order.code ?? '',
         avance: order.avance,
         amount: parseAvanceInput(order.avance) ?? 0,
-      }))
-      .sort((a, b) => a.nom.localeCompare(b.nom, 'fr'))
+      })
+    }
+
+    return rows.sort((a, b) => a.nom.localeCompare(b.nom, 'fr'))
   }, [bookLists, avanceDate])
 
   const dailyAvanceTotal = useMemo(

@@ -300,35 +300,45 @@ function Correction({ onNavigate }: CorrectionProps) {
     if (!editForm || !editingOrder) return
     setIsUpdating(true)
     try {
+      const parsedAvance = editForm.avance.trim() ? parseFloat(editForm.avance) : null
       const sharedFields = {
         nom: editForm.nom.trim(),
         email: editForm.email.trim(),
         telephone: editForm.telephone.trim(),
-        avance: editForm.avance ? parseFloat(editForm.avance) : null,
         note: editForm.note.trim(),
         couverture_demandee: editForm.couverture_demandee,
       }
 
+      // Avance on first child only — never duplicate across kids for the same client
       const updatePromises = editForm.children
         .filter(c => c.id)
-        .map(child =>
-          supabase
+        .map((child) => {
+          const isFirstChild = editForm.children.findIndex(c => c.id === child.id) === 0
+          return supabase
             .from('students')
-            .update({ ...sharedFields, ecole: child.ecole.trim(), niveau: child.niveau.trim(), genre: child.genre || null })
+            .update({
+              ...sharedFields,
+              ecole: child.ecole.trim(),
+              niveau: child.niveau.trim(),
+              genre: child.genre || null,
+              avance: isFirstChild ? parsedAvance : null,
+            })
             .eq('id', child.id)
-        )
+        })
 
       const insertPromises = editForm.children
         .filter(c => !c.id)
-        .map(child =>
-          supabase.from('students').insert([{
+        .map((child) => {
+          const isFirstChild = editForm.children[0] === child
+          return supabase.from('students').insert([{
             code: generateCode(),
             ...sharedFields,
             ecole: child.ecole.trim(),
             niveau: child.niveau.trim(),
             genre: child.genre || null,
+            avance: isFirstChild ? parsedAvance : null,
           }])
-        )
+        })
 
       const removedChildren = editingOrder.children.filter(
         orig => !editForm.children.some(f => f.id === orig.id)
