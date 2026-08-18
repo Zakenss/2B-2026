@@ -6,6 +6,61 @@ interface FollowUpProps {
   onNavigate: (page: 'espace-client') => void
 }
 
+/** Same client + same order submission batch */
+function orderBatchKey(order: Pick<Student, 'nom' | 'created_at' | 'email' | 'telephone'>): string {
+  return `${order.nom ?? ''}|${order.created_at ?? ''}|${order.email ?? ''}|${order.telephone ?? ''}`
+}
+
+/**
+ * Keep avance on at most one kid per client order.
+ * Extra sibling rows (including legacy duplicates) get avance cleared for display.
+ */
+function stripDuplicateAvances(orders: Student[]): Student[] {
+  const winnerByBatch = new Map<string, string>()
+
+  for (const order of orders) {
+    if (order.avance == null) continue
+    const key = orderBatchKey(order)
+    const current = winnerByBatch.get(key)
+    if (!current || order.id.localeCompare(current) < 0) {
+      winnerByBatch.set(key, order.id)
+    }
+  }
+
+  return orders.map(order => {
+    if (order.avance == null) return order
+    const winnerId = winnerByBatch.get(orderBatchKey(order))
+    return winnerId === order.id ? order : { ...order, avance: null }
+  })
+}
+
+/** For a single code result: only keep avance if this row is the first kid of that order. */
+async function withAvanceOnlyOnFirstChild(order: Student): Promise<Student> {
+  if (order.avance == null) return order
+
+  let query = supabase
+    .from('students')
+    .select('id, nom, created_at, email, telephone, avance')
+    .eq('nom', order.nom ?? '')
+
+  if (order.created_at) {
+    query = query.eq('created_at', order.created_at)
+  }
+
+  const { data: siblings, error } = await query
+  if (error || !siblings?.length) {
+    return order
+  }
+
+  const merged: Student[] = siblings.map(sibling =>
+    sibling.id === order.id
+      ? order
+      : ({ ...order, ...sibling } as Student)
+  )
+
+  return stripDuplicateAvances(merged).find(row => row.id === order.id) ?? { ...order, avance: null }
+}
+
 function FollowUp({ onNavigate }: FollowUpProps) {
   const [searchCode, setSearchCode] = useState('')
   const [searchMode, setSearchMode] = useState<'code' | 'school' | 'name'>('code')
@@ -81,7 +136,7 @@ function FollowUp({ onNavigate }: FollowUpProps) {
     try {
       const { data, error } = await supabase.from('students').select('*').eq('code', searchCode).single()
       if (error || !data) setNotFound(true)
-      else setBookList(data)
+      else setBookList(await withAvanceOnlyOnFirstChild(data))
     } catch {
       setNotFound(true)
     } finally {
@@ -98,7 +153,7 @@ function FollowUp({ onNavigate }: FollowUpProps) {
       const { data, error } = await supabase.from('students').select('*').eq('ecole', schoolSearch.ecole).eq('niveau', schoolSearch.niveau).order('created_at', { ascending: false })
       if (error) throw error
       if (!data || data.length === 0) setNotFound(true)
-      else setSchoolResults(data)
+      else setSchoolResults(stripDuplicateAvances(data))
     } catch {
       setNotFound(true)
     } finally {
@@ -116,7 +171,7 @@ function FollowUp({ onNavigate }: FollowUpProps) {
       const { data, error } = await supabase.from('students').select('*').eq('nom', nameSearch.trim()).order('created_at', { ascending: false })
       if (error) throw error
       if (!data || data.length === 0) setNotFound(true)
-      else setNameResults(data)
+      else setNameResults(stripDuplicateAvances(data))
     } catch {
       setNotFound(true)
     } finally {
